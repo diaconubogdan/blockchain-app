@@ -1,0 +1,93 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script>
+        $(function() {
+
+            function generareHTML(blocks) {
+                let blocksHtml = '';
+                blocks.forEach(block => {
+                    blocksHtml += (`<div class="card">
+                        <div class="card-header">
+                            Block-ul ${block.index}
+                        </div>
+                        <div class="card-content">
+                            <ul>
+                                <li>Data: ${block.data}</li>
+                                <li>Informatie: ${block.informatie}</li>
+                                <li>Hash: ${block.hash}</li>
+                                <li>Hash block precedent: ${block.hashPrecedent}</li>
+                                <li>Nonce: ${block.nonce}</li>
+                            </ul>
+                        </div>
+                    </div>`)
+                })
+                return blocksHtml;
+            }
+
+            $("#adaugaBlock").submit(function(event) {
+                event.preventDefault();
+                let numeBlock = $("#blockNou").val();
+                $.get(`/adaugaBlock/${numeBlock}`, function(data) {
+                    let blocksHtml = generareHTML(data.blocks);
+                    $('.container').html(blocksHtml);
+                    $("#blockAdaugat").show();
+                    $("#blockNou").val("");
+                })
+            })
+
+            $("#adaugaNod").submit(function(event) {
+                event.preventDefault();
+                let portNod = $("#nodNou").val();
+                $.get(`/adaugaNod/${portNod}`, function(data) {
+                    let blocksHtml = generareHTML(data.blocks);
+                    $('.container').html(blocksHtml);
+                    $("#nodAdaugat").show();
+                    $("#nodNou").val("");
+                })
+            })
+
+        })
+    </script>
+</head>
+<body>
+    <div class="header">
+        HTTP port: <%=httpPort %> | Socket port: <%=socketPort %>
+    </div>
+
+    <div class="inputs-container">
+        <form id="adaugaBlock">
+            <input id="blockNou" type="text" name="info" placeholder="Informatie block.."/><br />
+            <button id="submitBlock" type="submit">Adauga</button>
+        </form>
+        
+        <form id="adaugaNod">
+            <input id="nodNou" type="text" name="port" placeholder="Socket port.."/><br />
+            <button id="submitNod" type="submit">Conecteaza</button>
+        </form>
+    </div>
+    <div class="mesaje">
+        <p id="blockAdaugat">Blockul a fost adaugat cu succes.</p>
+        <p id="nodAdaugat">Conectarea a fost realizata cu succes. Refresh pentru a actualiza lista de block-uri.</p>
+    </div>
+    <div class="container">
+        <%for (var block in blocks){%>
+            <div class="card">
+                <div class="card-header">
+                    Block-ul <%=blocks[block].index%>
+                </div>
+                <div class="card-content">
+                    <ul>
+                        <li>Data: <%= blocks[block].data %></li>
+                        <li>Informatie: <%= blocks[block].informatie %></li>
+                        <li>Hash: <%= blocks[block].hash %></li>
+                        <li>Hash block precedent: <%= blocks[block].hashPrecedent %></li>
+                        <li>Nonce: <%= blocks[block].nonce %></li>
+                    </ul>
+                </div>
+            </div>
+        <%}%>
+    </div>
+</body>
+</html>
